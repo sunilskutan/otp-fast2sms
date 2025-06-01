@@ -8,10 +8,15 @@ app.get("/", (req, res) => {
   res.send("✅ Fast2SMS OTP API is running!");
 });
 
-// your existing OTP route
-app.post("/send-otp", (req, res) => {
-  // handle sending OTP
+app.post("/send-otp", async (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ message: "Phone number is required" });
+
+  // your Fast2SMS logic here...
+  
+  res.json({ message: `OTP sent to ${phone}` });
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
