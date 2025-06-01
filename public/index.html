@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head><title>Fast2SMS OTP</title></head>
+<body>
+  <h3>Phone OTP via Fast2SMS</h3>
+  <input id="phone" placeholder="Enter phone number" /><br><br>
+  <button onclick="sendOTP()">Send OTP</button>
+
+  <br><br>
+
+  <input id="otp" placeholder="Enter OTP" /><br><br>
+  <button onclick="verifyOTP()">Verify OTP</button>
+
+  <script>
+    const apiURL = "https://your-railway-app.up.railway.app";
+
+    async function sendOTP() {
+      const phone = document.getElementById("phone").value;
+      const res = await fetch(`${apiURL}/send-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone })
+      });
+      const data = await res.json();
+      alert(data.success ? "OTP Sent!" : "Failed to send OTP");
+    }
+
+    async function verifyOTP() {
+      const phone = document.getElementById("phone").value;
+      const otp = document.getElementById("otp").value;
+      const res = await fetch(`${apiURL}/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, otp })
+      });
+      const data = await res.json();
+      alert(data.verified ? "OTP Verified!" : "Incorrect OTP");
+    }
+  </script>
+</body>
+</html>
