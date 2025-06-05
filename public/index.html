@@ -1,33 +1,69 @@
 <!DOCTYPE html>
 <html>
-<head><title>Send OTP</title></head>
+<head>
+  <title>Send OTP</title>
+  <style>
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
 <body>
   <input type="text" id="phone" placeholder="Enter phone number" />
   <button onclick="sendOTP()">Send OTP</button>
 
+  <div id="status"></div>
+
   <script>
-   async function sendOTP() {
-  const phone = document.getElementById("phone").value;
-  const otp = Math.floor(100000 + Math.random() * 900000); // generate 6-digit OTP
+    async function sendOTP() {
+      const phone = document.getElementById("phone").value.trim();
+      const status = document.getElementById("status");
+      status.textContent = "";
 
-  const response = await fetch('https://otp-fast2sms.onrender.com/send-otp', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ phone, otp })
-  });
+      // Check for empty input
+      if (!phone) {
+        status.textContent = "📵 Please enter a phone number.";
+        status.style.color = "red";
+        return;
+      }
 
-  const data = await response.json();
+      // Basic validation for phone number (Indian format assumed)
+      if (!/^[6-9]\d{9}$/.test(phone)) {
+        status.textContent = "❌ Invalid phone number. Please enter a valid 10-digit number.";
+        status.style.color = "red";
+        return;
+      }
 
-  if (data.success) {
-    alert("OTP sent: " + otp);
-    // Optionally store OTP in sessionStorage for verification
-    sessionStorage.setItem("sentOTP", otp);
-  } else {
-    alert("Failed to send OTP: " + data.error);
-  }
-}
+      const otp = Math.floor(100000 + Math.random() * 900000); // 6-digit OTP
+      status.textContent = "📨 Sending OTP...";
+      status.style.color = "blue";
+
+      try {
+        const response = await fetch('https://otp-fast2sms.onrender.com/send-otp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ phone, otp })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          sessionStorage.setItem("sentOTP", otp);
+          status.textContent = `✅ OTP sent successfully to ${phone}.`;
+          status.style.color = "green";
+        } else {
+          status.textContent = `❌ Failed to send OTP: ${data.error || "Unknown error"}`;
+          status.style.color = "red";
+        }
+      } catch (error) {
+        status.textContent = `🚫 Network error: ${error.message}`;
+        status.style.color = "red";
+      }
+    }
   </script>
 </body>
 </html>
